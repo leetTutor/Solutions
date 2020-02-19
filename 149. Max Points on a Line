@@ -1,0 +1,52 @@
+class Solution {
+    public int maxPoints(int[][] points) {
+        // edge cases
+        if (points == null) {
+            return 0;
+        }
+        if (points.length <= 2) {
+            return points.length;
+        }
+        HashMap<Pair<Integer,Integer>,Integer> hm = new HashMap<>();
+        int max = 0;
+        for (int i = 0; i < points.length-1; i++) {
+            int[] p1 = points[i];
+            int samePoint = 0;
+            int localMax = 0;
+            for (int j = i+1; j < points.length; j++) {
+                int[] p2 = points[j];
+                int sameSlopePoints = 0;
+                Pair<Integer,Integer> slope = getSlope(p1, p2);
+                if (slope.getKey() == 0 && slope.getValue() == 0) {
+                    ++samePoint;
+                } else {
+                    hm.put(slope, hm.getOrDefault(slope, 0) + 1);
+                    sameSlopePoints = hm.get(slope);
+                    localMax = Math.max(localMax, sameSlopePoints);
+                }
+            }
+            max = Math.max(max, localMax + 1 + samePoint);
+            // clear to avoid conflict with parallel lines
+            hm.clear();
+        }
+        return max;
+    }
+    
+    public Pair<Integer, Integer> getSlope(int[] p1, int[] p2) {
+        int num = p2[1] - p1[1];
+        int den = p2[0] - p1[0];
+        int gcd = gcd(num , den);
+        if (gcd == 0) {
+            return new Pair<>(0,0);
+        }
+        return new Pair<>(num/gcd, den/gcd);
+    }
+    
+    public int gcd(int a, int b) {
+        if(b == 0) {
+            return a;
+        }
+        int r = a % b;
+        return gcd(b, r);
+    }
+}
